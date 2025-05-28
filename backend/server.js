@@ -9,12 +9,10 @@ const WebSocket = require('ws');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors({ origin: 'http://localhost:3001' }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadDir = './Uploads';
@@ -44,10 +42,8 @@ const upload = multer({
   }
 });
 
-// Python script path
 const PYTHON_SCRIPT = path.join(__dirname, 'face_recognition_backend.py');
 
-// Helper function to execute Python RAG script
 function executePythonRAG(action, args = []) {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(PYTHON_SCRIPT)) {
@@ -92,7 +88,6 @@ function executePythonRAG(action, args = []) {
   });
 }
 
-// WebSocket Server
 try {
   const wss = new WebSocket.Server({ port: 3002 }, () => {
     console.log('WebSocket server started on ws://localhost:3002');
@@ -139,7 +134,6 @@ try {
   console.error('Failed to start WebSocket server:', error);
 }
 
-// Face Recognition Routes
 app.post('/api/recognize', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
