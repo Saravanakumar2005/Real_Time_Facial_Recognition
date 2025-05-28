@@ -17,13 +17,11 @@ import io
 from PIL import Image
 import os
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FaceRecognitionRAG:
     def __init__(self):
-        # MongoDB connection
         self.client = pymongo.MongoClient('mongodb://localhost:27017/')
         self.db = self.client['facialrecognition']
         self.faces_collection = self.db['faces']
@@ -33,18 +31,14 @@ class FaceRecognitionRAG:
         self.recognition_threshold = 0.4
         self.similarity_threshold = 0.6
         
-        # Initialize InsightFace
         self.init_insightface()
         
-        # Load all faces into memory for RAG
         self.load_all_faces()
         
-        # RAG components
-        self.face_index = {}  # Face embedding index for fast retrieval
-        self.face_metadata = {}  # Additional metadata for context
+        self.face_index = {}
+        self.face_metadata = {}
         
     def init_insightface(self):
-        """Initialize InsightFace models"""
         try:
             self.app = FaceAnalysis(providers=['CPUExecutionProvider'])
             self.app.prepare(ctx_id=0, det_size=(640, 640))
@@ -54,7 +48,6 @@ class FaceRecognitionRAG:
             self.app = None
             
     def load_all_faces(self):
-        """Load all faces from MongoDB for RAG retrieval"""
         try:
             faces = list(self.faces_collection.find())
             self.face_encodings = []
@@ -71,7 +64,6 @@ class FaceRecognitionRAG:
                 self.face_names.append(face['name'])
                 self.face_ids.append(face_id)
                 
-                # Build RAG index
                 self.face_index[face_id] = {
                     'embedding': embedding,
                     'name': face['name'],
@@ -79,7 +71,6 @@ class FaceRecognitionRAG:
                     'last_seen': face.get('last_seen', datetime.now())
                 }
                 
-                # Store metadata for context generation
                 self.face_metadata[face_id] = {
                     'recognition_count': face.get('recognition_count', 0),
                     'locations': face.get('locations', []),
@@ -94,7 +85,6 @@ class FaceRecognitionRAG:
             logger.error(f"❌ Failed to load faces: {e}")
             
     def extract_face_features(self, image_input, input_type='path'):
-        """Extract face features from image"""
         try:
             if self.app is None:
                 return None
@@ -136,7 +126,6 @@ class FaceRecognitionRAG:
             return None
     
     def retrieve_similar_faces(self, query_embedding, top_k=5):
-        """RAG Retrieve: Find similar faces from the database"""
         try:
             if len(self.face_encodings) == 0:
                 return []
@@ -163,7 +152,6 @@ class FaceRecognitionRAG:
             return []
     
     def augment_context(self, similar_faces, query_info=None):
-        """RAG Augment: Generate context from retrieved faces"""
         try:
             if not similar_faces:
                 return {
@@ -209,7 +197,6 @@ class FaceRecognitionRAG:
             return {'context': 'Error generating context', 'recommendations': [], 'confidence': 0.0}
     
     def generate_response(self, query_face, similar_faces, augmented_context, action='recognize'):
-        """RAG Generate: Create final response based on context"""
         try:
             response = {
                 'timestamp': datetime.now().isoformat(),
@@ -260,7 +247,6 @@ class FaceRecognitionRAG:
             return {'error': str(e), 'timestamp': datetime.now().isoformat()}
     
     def update_recognition_stats(self, face_id):
-        """Update recognition statistics"""
         try:
             self.faces_collection.update_one(
                 {'_id': ObjectId(face_id)},
@@ -279,7 +265,6 @@ class FaceRecognitionRAG:
             logger.error(f"Stats update failed: {e}")
     
     def register_new_face(self, image_input, person_name, input_type='path', metadata=None):
-        """Register a new face in the RAG system"""
         try:
             face_data = self.extract_face_features(image_input, input_type)
             if not face_data:
@@ -320,14 +305,13 @@ class FaceRecognitionRAG:
             return {'success': False, 'error': str(e)}
     
     def list_registered_people(self):
-        """List all registered people"""
         try:
             faces = list(self.faces_collection.find())
             people = []
             for face in faces:
                 people.append({
                     'name': face['name'],
-                    'image_count': 1,  # Assuming one image per person
+                    'image_count': 1,
                     'recognition_count': face.get('recognition_count', 0),
                     'last_seen': face.get('last_seen', datetime.now()).isoformat()
                 })
@@ -337,7 +321,6 @@ class FaceRecognitionRAG:
             return {'success': False, 'error': str(e)}
     
     def delete_person(self, name):
-        """Delete a person by name"""
         try:
             result = self.faces_collection.delete_many({'name': name})
             if result.deleted_count > 0:
@@ -349,7 +332,6 @@ class FaceRecognitionRAG:
             return {'success': False, 'error': str(e)}
     
     def clear_all_data(self):
-        """Clear all face data"""
         try:
             self.faces_collection.delete_many({})
             self.logs_collection.delete_many({})
@@ -361,7 +343,6 @@ class FaceRecognitionRAG:
             return {'success': False, 'error': str(e)}
     
     def process_rag_request(self, image_input, action='recognize', person_name=None, input_type='path'):
-        """Main RAG processing pipeline"""
         try:
             query_face = self.extract_face_features(image_input, input_type)
             if not query_face and action != 'status':
@@ -385,7 +366,6 @@ class FaceRecognitionRAG:
             return {'error': str(e), 'timestamp': datetime.now().isoformat()}
     
     def get_system_status(self):
-        """Get RAG system status"""
         try:
             total_faces = len(self.face_encodings)
             total_logs = self.logs_collection.count_documents({})
@@ -401,7 +381,6 @@ class FaceRecognitionRAG:
         except Exception as e:
             return {'status': 'error', 'error': str(e)}
 
-# CLI interface for server.js integration
 def main():
     if len(sys.argv) < 2:
         print(json.dumps({"error": "Invalid arguments. Usage: python script.py <action> [arguments...]"}))
