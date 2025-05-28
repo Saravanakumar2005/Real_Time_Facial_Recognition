@@ -1,0 +1,152 @@
+@import 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
+
+.App {
+  @apply flex flex-col items-center min-h-screen bg-gray-100;
+}
+
+.App-header {
+  @apply w-full max-w-4xl;
+}
+
+h1 {
+  @apply text-4xl font-extrabold text-gray-800 mb-8;
+}
+
+.system-status {
+  @apply flex justify-center gap-4 mb-6;
+}
+
+.status-indicator {
+  @apply px-4 py-2 rounded-full text-sm font-medium;
+}
+
+.status-indicator.connected {
+  @apply bg-green-100 text-green-700;
+}
+
+.status-indicator.disconnected {
+  @apply bg-red-100 text-red-700;
+}
+
+.status-message {
+  @apply transition-opacity duration-300;
+}
+
+.status-message.success {
+  @apply bg-green-500;
+}
+
+.status-message.error {
+  @apply bg-red-500;
+}
+
+.status-message.warning {
+  @apply bg-yellow-500;
+}
+
+.status-message.info {
+  @apply bg-blue-500;
+}
+
+.loading-indicator {
+  @apply flex items-center gap-2;
+}
+
+.video-container {
+  @apply relative max-w-full flex justify-center;
+}
+
+video {
+  @apply w-full max-w-2xl h-auto;
+}
+
+.registration-overlay {
+  @apply absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg;
+}
+
+.countdown {
+  @apply text-white text-xl font-semibold animate-pulse;
+}
+
+.controls {
+  @apply bg-white p-6 rounded-lg shadow-md mb-6;
+}
+
+.mode-section {
+  @apply mb-4;
+}
+
+.btn {
+  @apply transition-colors duration-200;
+}
+
+.btn:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.name-input {
+  @apply border border-gray-300 rounded px-3 py-2 flex-grow focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.stats-section {
+  @apply bg-white p-6 rounded-lg shadow-md mb-6;
+}
+
+.stats-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.stat-item {
+  @apply p-4 bg-gray-50 rounded-lg text-center;
+}
+
+.stat-label {
+  @apply text-gray-600;
+}
+
+.stat-value {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.people-section {
+  @apply bg-white p-6 rounded-lg shadow-md;
+}
+
+.section-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.no-data {
+  @apply text-gray-500 text-center;
+}
+
+.person-item {
+  @apply flex justify-between items-center p-3 bg-gray-50 rounded-lg transition-all duration-200 hover:bg-gray-100;
+}
+
+.person-info {
+  @apply flex items-center gap-2;
+}
+
+.person-name {
+  @apply font-medium text-gray-800;
+}
+
+.person-count {
+  @apply text-gray-500;
+}
+
+.rag-section {
+  @apply mt-6;
+}
+
+/* Custom spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  @apply animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full;
+}
