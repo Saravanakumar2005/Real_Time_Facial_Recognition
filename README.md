@@ -1,4 +1,4 @@
-# 🧠 Face Recognition Platform with Real-Time AI Q&A using RAG
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/779dcad3-870b-42a2-904c-2e4b0ee8582f" /># 🧠 Face Recognition Platform with Real-Time AI Q&A using RAG
 
 A browser-based platform for registering and recognizing faces in real-time using the laptop webcam. It supports multi-face detection and includes a chatbot interface powered by Retrieval-Augmented Generation (RAG) to answer queries about face registration events.
 
@@ -113,7 +113,7 @@ Ensure the `.whl` file is in the same directory or provide the full path to the 
 
 ## 🧱 Architecture Diagram
 
-<img src="https://github.com/user-attachments/assets/80adeb3e-570c-4f39-968d-a8b76157adbe" width="400" />
+<img src="https://chat.openai.com/cdn/pub/file_0000000049e8622f90be69dd883e73ad" width="400" />
 
 ---
 
