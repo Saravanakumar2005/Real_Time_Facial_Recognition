@@ -88,7 +88,7 @@ A browser-based platform for registering and recognizing faces in real-time usin
 ### 📦 Prerequisites
 
 * Python 3.10
-* MongoDB (MongoDB Atlas or local)
+* MySql-Workbench
 * Webcam-enabled device
 
 ### 🔧 Backend Setup(Flask + Face Recognition + RAG)
