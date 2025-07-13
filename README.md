@@ -113,7 +113,7 @@ Ensure the `.whl` file is in the same directory or provide the full path to the 
 
 ## 🧱 Architecture Diagram
 
-<img src="https://chat.openai.com/cdn/pub/file-P5RKyQmrF3GVnX37oZ8WrL" width="400" />
+![Architecture Diagram](https://chat.openai.com/cdn/pub/file-KtbFJqxtB64hwMWgwALWgA)
 
 ---
 
