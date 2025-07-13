@@ -1,4 +1,4 @@
-🧠 Face Recognition Platform with Real-Time AI Q&A using RAG
+## 🧠 Face Recognition Platform with Real-Time AI Q&A using RAG
 
 A browser-based platform for registering and recognizing faces in real-time using the laptop webcam. It supports multi-face detection and includes a chatbot interface powered by Retrieval-Augmented Generation (RAG) to answer queries about face registration events.
 
@@ -108,12 +108,6 @@ pip install insightface-0.7.3-cp310-cp310-win_amd64.whl
 ```
 
 Ensure the `.whl` file is in the same directory or provide the full path to the file.
-
----
-
-## 🧱 Architecture Diagram
-
-<img src="https://chat.openai.com/cdn/pub/file-P5RKyQmrF3GVnX37oZ8WrL" width="400" />
 
 ---
 
