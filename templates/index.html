@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Real-time Face Recognition System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .video-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-container {
+            position: relative;
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .processed-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            max-width: calc(100% - 20px);
+            word-wrap: break-word;
+        }
+
+        .recognition-results {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .face-result {
+            margin-bottom: 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .face-result:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .face-recognized {
+            color: #4CAF50;
+        }
+
+        .face-unknown {
+            color: #FF6B6B;
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .file-input-label:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .chat-section {
+            margin-top: 30px;
+        }
+
+        .chat-container {
+            height: 300px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            margin-bottom: 15px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .chat-message.user {
+            background: #667eea;
+            color: white;
+            margin-left: 20px;
+        }
+
+        .chat-message.bot {
+            background: #f8f9fa;
+            color: #333;
+            margin-right: 20px;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="header">
+                <h1>🎯 Real-time Face Recognition System</h1>
+                <p>Advanced AI-Powered Face Detection & Recognition</p>
+            </div>
+
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="video" autoplay muted playsinline></video>
+                    <img id="processedImage" class="processed-image" alt="Processed">
+                    <div class="video-overlay" id="videoOverlay">Ready</div>
+                    <div class="recognition-results" id="recognitionResults"></div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startCamera()">📹 Start Camera</button>
+                    <button class="btn btn-danger" onclick="stopCamera()">⏹️ Stop Camera</button>
+                    <button class="btn btn-success" onclick="captureAndRecognize()">🔍 Recognize Face</button>
+                    <button class="btn btn-info" onclick="refreshData()">🔄 Refresh Data</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>👤 Register New Face</h3>
+            <div class="form-group">
+                <label for="personName">Person Name:</label>
+                <input type="text" id="personName" class="form-control" placeholder="Enter person's name">
+            </div>
+            <div class="form-group">
+                <label>Photo:</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="photoInput" class="file-input" accept="image/*">
+                    <label for="photoInput" class="file-input-label">
+                        📷 Choose Photo or Use Camera
+                    </label>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="registerFace()" style="width: 100%;">
+                ✅ Register Face
+            </button>
+
+            <div class="chat-section">
+                <h3>💬 Ask Questions</h3>
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-message bot">
+                        Hi! I can help you with questions about registered faces, recognition logs, and system statistics. Try asking:
+                        <br>• "Who was the 3rd person registered?"
+                        <br>• "How many people are registered?"
+                        <br>• "Show me recent recognition logs"
+                    </div>
+                </div>
+                <div class="chat-input-group">
+                    <input type="text" id="chatInput" class="form-control chat-input" 
+                           placeholder="Ask about the face recognition database...">
+                    <button class="btn btn-primary" onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById('video');
+        let processedImage = document.getElementById('processedImage');
+        let videoOverlay = document.getElementById('videoOverlay');
+        let recognitionResults = document.getElementById('recognitionResults');
+        let stream = null;
+        let isRecognizing = false;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+            
+            setTimeout(startCamera, 1000);
+            
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+        });
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                processedImage.style.display = 'none';
+                
+                updateVideoOverlay('Camera Active');
+                
+                startContinuousRecognition();
+                
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                updateVideoOverlay('Camera Error');
+                alert('Error accessing camera: ' + err.message);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.srcObject = null;
+            video.style.display = 'none';
+            processedImage.style.display = 'none';
+            recognitionResults.style.display = 'none';
+            
+            updateVideoOverlay('Camera Stopped');
+            isRecognizing = false;
+        }
+
+        function startContinuousRecognition() {
+            if (!stream || isRecognizing) return;
+            
+            isRecognizing = true;
+            const recognizeInterval = setInterval(() => {
+                if (!stream || !isRecognizing) {
+                    clearInterval(recognizeInterval);
+                    return;
+                }
+                captureAndRecognize(false);
+            }, 3000);
+        }
+
+        async function captureAndRecognize(showAlert = true) {
+            if (!stream) {
+                if (showAlert) alert('Please start the camera first');
+                return;
+            }
+
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                
+                const imageData = canvas.toDataURL('image/jpeg', 0.8);
+                
+                const response = await fetch('/recognize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image: imageData })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.faces && result.faces.length > 0) {
+                    displayMultipleFaceResults(result.faces);
+                    
+                    updateVideoOverlay(`${result.total_faces} face(s) detected`);
+                    
+                    if (result.processed_image) {
+                        processedImage.src = 'data:image/jpeg;base64,' + result.processed_image;
+                        processedImage.style.display = 'block';
+                        video.style.display = 'none';
+                        
+                        setTimeout(() => {
+                            if (stream) {
+                                video.style.display = 'block';
+                                processedImage.style.display = 'none';
+                            }
+                        }, 4000);
+                    }
+                    
+                    if (showAlert) {
+                        const recognizedFaces = result.faces.filter(f => f.success);
+                        if (recognizedFaces.length > 0) {
+                            const names = recognizedFaces.map(f => f.person_name).join(', ');
+                            alert(`Recognized: ${names}`);
+                        }
+                    }
+                } else {
+                    updateVideoOverlay('No faces detected');
+                    recognitionResults.style.display = 'none';
+                    if (showAlert && result.message) {
+                        alert('Face recognition: ' + result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in captureAndRecognize:', error);
+                updateVideoOverlay('Error: ' + error.message);
+                recognitionResults.style.display = 'none';
+                if (showAlert) {
+                    alert('Error during face recognition: ' + error.message);
+                }
+            }
+        }
+
+        function displayMultipleFaceResults(faces) {
+            if (!faces || faces.length === 0) {
+                recognitionResults.style.display = 'none';
+                return;
+            }
+
+            let resultsHTML = '';
+            faces.forEach((face, index) => {
+                if (face.success) {
+                    resultsHTML += `
+                        <div class="face-result face-recognized">
+                            👤 Face ${index + 1}: ${face.person_name} (${face.confidence.toFixed(1)}%)
+                        </div>
+                    `;
+                } else {
+                    resultsHTML += `
+                        <div class="face-result face-unknown">
+                            ❓ Face ${index + 1}: Unknown
+                        </div>
+                    `;
+                }
+            });
+
+            recognitionResults.innerHTML = resultsHTML;
+            recognitionResults.style.display = 'block';
+
+            setTimeout(() => {
+                recognitionResults.style.display = 'none';
+            }, 5000);
+        }
+
+        async function registerFace() {
+            const name = document.getElementById('personName').value.trim();
+            const photoInput = document.getElementById('photoInput');
+            
+            if (!name) {
+                alert('Please enter a person name');
+                return;
+            }
+
+            let imageData = null;
+
+            if (photoInput.files && photoInput.files[0]) {
+                const file = photoInput.files[0];
+                imageData = await fileToBase64(file);
+            } else if (stream) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                imageData = canvas.toDataURL('image/jpeg', 0.8);
+            } else {
+                alert('Please upload a photo or start the camera');
+                return;
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        image: imageData
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showNotification(`Face registered successfully for ${name}!`, 'success');
+                    
+                    document.getElementById('personName').value = '';
+                    document.getElementById('photoInput').value = '';
+                    
+                    if (result.processed_image) {
+                        processedImage.src = 'data:image/jpeg;base64,' + result.processed_image;
+                        processedImage.style.display = 'block';
+                        video.style.display = 'none';
+                        
+                        setTimeout(() => {
+                            if (stream) {
+                                video.style.display = 'block';
+                                processedImage.style.display = 'none';
+                            }
+                        }, 5000);
+                    }
+                    
+                    refreshData();
+                } else {
+                    showNotification(result.message || 'Registration failed', 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showNotification('Registration failed: ' + error.message, 'danger');
+            }
+        }
+
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            addChatMessage(message, 'user');
+            chatInput.value = '';
+            
+            const loadingId = addChatMessage('Thinking...', 'bot');
+            
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: message })
+                });
+                
+                const result = await response.json();
+                
+                const loadingElement = document.getElementById(loadingId);
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+                
+                addChatMessage(result.answer || 'Sorry, I could not process your question.', 'bot');
+                
+            } catch (error) {
+                console.error('Chat error:', error);
+                const loadingElement = document.getElementById(loadingId);
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
+                addChatMessage('Sorry, there was an error processing your question.', 'bot');
+            }
+        }
+
+        function addChatMessage(message, sender) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            const messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            messageDiv.id = messageId;
+            messageDiv.className = `chat-message ${sender}`;
+            messageDiv.textContent = message;
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return messageId;
+        }
+
+        async function refreshData() {
+            try {
+                const response = await fetch('/status');
+                if (response.ok) {
+                    const data = await response.json();
+                }
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+            }
+        }
+
+        function updateVideoOverlay(text) {
+            if (videoOverlay) {
+                videoOverlay.textContent = text;
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type}`;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.style.maxWidth = '300px';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+    </script>
+</body>
+</html>
