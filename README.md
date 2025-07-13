@@ -1,4 +1,4 @@
-# 🧠 Face Recognition Platform with Real-Time AI Q\&A using RAG
+# 🧠 Face Recognition Platform with Real-Time AI Q&A using RAG
 
 A browser-based platform for registering and recognizing faces in real-time using the laptop webcam. It supports multi-face detection and includes a chatbot interface powered by Retrieval-Augmented Generation (RAG) to answer queries about face registration events.
 
@@ -22,8 +22,8 @@ A browser-based platform for registering and recognizing faces in real-time usin
 
 ### 💬 Chat-Based Query (RAG)
 
-* Embedded chat widget (React)
-* RAG architecture using WebSockets (React ↔ Node.js ↔ Python)
+* Embedded chatbot interface (HTML + CSS)
+* RAG architecture using Flask (with Python) and WebSockets
 * Ask questions like:
 
   * "Who was the last person registered?"
@@ -37,11 +37,11 @@ A browser-based platform for registering and recognizing faces in real-time usin
 
 ### 💅 Frontend
 
-* React.js
+* HTML + CSS + JavaScript
 
 ### 💅 Backend
 
-* Node.js (API + WebSocket Server)
+* Python (Flask + WebSocket)
 
 ### 🤖 Face Recognition & RAG
 
@@ -49,47 +49,34 @@ A browser-based platform for registering and recognizing faces in real-time usin
 
 #### 🔍 Face Recognition
 
-* numpy
-* opencv
-* insightface
-* onnxruntime
-* pandas
+* numpy  
+* opencv  
+* insightface  
+* onnxruntime  
+* pandas  
 
 #### 📆 Data Processing & ML
 
-* scikit-learn
+* scikit-learn  
 
 #### 📚 Retrieval-Augmented Generation (RAG)
 
-* langchain
-* chromadb
-* faiss-cpu
-* tiktoken
+* langchain  
+* chromadb  
+* faiss-cpu  
+* tiktoken  
 
 ---
+
 
 ## 🏗 Project Structure (Monorepo)
 
 ```
 ├── backend/
-│   ├── node_modules/
-│   ├── Uploads/
-│   ├── face_recognition_backend.py
-│   ├── package-lock.json
-│   ├── package.json
-│   └── server.js
-│
+│   ├── app.py
 ├── frontend/
-│   ├── node_modules/
-│   ├── public/
-│   └── src/
-│       ├── App.css
-│       ├── App.js
-│       ├── App.test.js
-│       ├── index.css
-│       ├── index.js
-│       ├── logo.svg
-│       └── RAGChatBox.js
+│   └── template/
+│       ├── index.html
 │
 └── README.md
 ```
@@ -100,29 +87,14 @@ A browser-based platform for registering and recognizing faces in real-time usin
 
 ### 📦 Prerequisites
 
-* Node.js
-* MongoDB
-* Python 3.10+
+* Python 3.10
+* MongoDB (MongoDB Atlas or local)
+* Webcam-enabled device
 
-### 🔧 Frontend Setup
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 🔧 Backend Setup (Node.js)
+### 🔧 Backend Setup(Flask + Face Recognition + RAG)
 
 ```bash
 cd backend
-npm install
-node server.js
-```
-
-### 🧠 Python RAG & Face Recognition Services
-
-```bash
 pip install -r requirements.txt
 python app.py
 ```
@@ -147,8 +119,8 @@ Ensure the `.whl` file is in the same directory or provide the full path to the 
 
 ## 📜 Assumptions
 
-* Using MongoDB Atlas for cloud database
-* WebSocket is used for real-time chat updates
+* Using MongoDB MySql-Workbench for the database
+* Flask-SocketIO  is used for real-time chat updates
 * Basic error handling and logging implemented for face registration
 * User identification in chat handled by session context
 
